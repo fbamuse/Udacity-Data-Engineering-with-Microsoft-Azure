@@ -15,8 +15,8 @@ time_table_drop     = "DROP TABLE IF EXISTS sparkifydb.time"
 # CREATE TABLES
 
 songplay_table_create = ("""
-                      CREATE TABLE IF NOT EXISTS songplay(
-                      songplay_id integer Not Null UNIQUE PRIMARY KEY,
+                      CREATE TABLE IF NOT EXISTS songplays(
+                      songplay_id SERIAL NOT NULL PRIMARY KEY,
                       start_time timestamp NOT NULL,
                       user_id integer NOT NULL,
                       level VARCHAR,
@@ -59,7 +59,7 @@ artist_table_create = ("""
 
 time_table_create = ("""
                     CREATE TABLE IF NOT EXISTS time (
-                    start_time timestamp,
+                    start_time timestamp  NOT NULL UNIQUE PRIMARY KEY,
                     hour integer,
                     day integer,
                     week integer,
@@ -71,8 +71,8 @@ time_table_create = ("""
 # INSERT RECORDS
 
 songplay_table_insert = ("""
-    INSERT INTO songplay (
-                        songplay_id,
+    INSERT INTO songplays (
+                        songplay_id ,
                         start_time,
                         user_id,
                         level,
@@ -81,7 +81,7 @@ songplay_table_insert = ("""
                         session_id,
                         location,
                         user_agent
-                        ) VALUES (%s, %s, %s, %s, %s,%s, %s, %s, %s)
+                        ) VALUES (DEFAULT,%s,%s,%s,%s,%s,%s,%s,%s)
                         ON CONFLICT (songplay_id)  DO NOTHING;
                         """)
 
@@ -92,8 +92,9 @@ user_table_insert = ("""
                         last_name,
                         gender,
                         level
-                        ) VALUES (%s, %s, %s, %s, %s)
-                        ON CONFLICT (user_id)  DO NOTHING;
+                        ) VALUES (%s,%s,%s,%s,%s)
+                        ON CONFLICT (user_id) 
+                        DO UPDATE SET level =EXCLUDED.level
                         """)
 
 song_table_insert = ("""
@@ -103,7 +104,7 @@ song_table_insert = ("""
                         artist_id,
                         year,
                         duration
-                        ) VALUES (%s, %s, %s, %s, %s)
+                        ) VALUES (%s,%s,%s,%s,%s)
                         ON CONFLICT (song_id)  DO NOTHING;
                         """)
 
@@ -114,7 +115,7 @@ artist_table_insert = ("""
                         location,
                         latitude,
                         longitude
-                        ) VALUES (%s, %s, %s, %s, %s)
+                        ) VALUES (%s,%s,%s,%s,%s)
                         ON CONFLICT (artist_id)  DO NOTHING;
                         """)
 
@@ -128,7 +129,8 @@ time_table_insert = ("""
                         month,
                         year,
                         weekday 
-                        ) VALUES (%s, %s, %s,%s,%s,%s,%s)
+                        ) VALUES (%s,%s,%s,%s,%s,%s,%s)
+                         ON CONFLICT (start_time)  DO NOTHING;
                         """)
 
 # FIND SONGS
@@ -137,7 +139,7 @@ song_select = ("""
     SELECT song_id,songs.artist_id FROM songs 
                     LEFT JOIN artists 
                     ON songs.artist_id = artists.artist_id 
-                    WHERE artists.name = %s  AND songs.title = %s  AND songs.duration = %s
+                    WHERE songs.title = %s AND artists.name = %s AND songs.duration = %s
                         
 """)
 
