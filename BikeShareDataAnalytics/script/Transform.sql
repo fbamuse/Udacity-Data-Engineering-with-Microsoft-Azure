@@ -10,7 +10,7 @@ select
     birthday,
     member,
     start_date,
-    DATEDIFF(hour,birthday,start_date)/8766 AS StartAge
+    DATEDIFF(year,birthday,start_date) AS AccountStartAge
 into rider_dimension
 from rider_stage;
 
@@ -35,7 +35,7 @@ select
     member_id,
     DATEPART(HOUR, start_at) AS TimeDay,
     DATEDIFF(MINUTE,start_at,end_at) as SpentTime,
-    DATEDIFF(hour,rider_dimension.birthday,rider_dimension.start_date)/8766 AS AccountStartAge
+    DATEDIFF(year,rider_dimension.birthday,start_at) AS AgeAtTrip
 Into Trip_Fact
 from trip_stage
 join rider_dimension on(member_id=rider_dimension.rider_id);
