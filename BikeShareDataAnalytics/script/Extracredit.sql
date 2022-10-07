@@ -1,16 +1,16 @@
 
 select 
     avg(tripcount) as avg_tripcount,
-    avg(SpentTime) as avg_spentTime,
+    avg(avg_Duration) as avg_Duration,
     member_id 
     into user_activity
 from(
-    select count(SpentTime) as tripcount,
-        avg(SpentTime)as SpentTime,
+    select count(Duration) as tripcount,
+        avg(Duration) as avg_Duration,
         member_id,
         MonthYear
-    from trip_Fact
-    Join Calendar on (try_convert(DATE,start_at)=date)
+    from Trip_Fact
+    Join Calendar_dimension on (try_convert(DATE,start_at)=date)
     group by member_id,MonthYear
 ) AS T 
 GROUP by member_id;
@@ -19,7 +19,7 @@ select
     account_number,
     total_payment,
     avg_tripcount,
-    avg_spentTime
+    avg_Duration
 from user_activity 
 JOIN(select 
         account_number,

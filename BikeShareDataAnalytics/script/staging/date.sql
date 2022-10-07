@@ -61,7 +61,7 @@ set
 ;
 
 
-CREATE  TABLE Calendar
+CREATE  TABLE Calendar_dimension
 WITH
 (
     DISTRIBUTION = ROUND_ROBIN
