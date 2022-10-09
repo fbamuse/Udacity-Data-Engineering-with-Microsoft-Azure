@@ -1,29 +1,22 @@
-
 DECLARE @StartDate DATE = (select min(CONVERT(DATE, start_at)) from trip_stage);
 DECLARE @CutoffDate DATE = (select max(CONVERT(DATE, end_at)) from trip_stage);
--- prevent set or regional settings from interfering with 
--- interpretation of dates / literals
+
 
 CREATE TABLE #dimdate
 (
-  [date]       DATE,  
-  [day]        tinyint,
-  [month]      tinyint,
-  FirstOfMonth date,
+  [date]         DATE,  
+  [day]         tinyint,
+  [month]       tinyint,
   [MonthName]  varchar(12),
-  [week]       tinyint,
-  [ISOweek]    tinyint,
-  [DayOfWeek]  tinyint,
-  [quarter]    tinyint,
-  [year]       smallint,
-  FirstOfYear  date,
-  Style112     char(8),
-  Style101     char(10)
+  [WeekDay]     tinyint,
+  [quarter]     tinyint,
+  [year]        smallint
 );
 
 
 SET DATEFORMAT mdy;
 SET LANGUAGE US_ENGLISH;
+
 
 
 
@@ -48,35 +41,28 @@ UPDATE #DimDate
 set 
   [day]        = DATEPART(DAY,      [date]),
   [month]      = DATEPART(MONTH,    [date]),
-  FirstOfMonth = CONVERT(DATE, DATEADD(MONTH, DATEDIFF(MONTH, 0, [date]), 0)),
   [MonthName]  = DATENAME(MONTH,    [date]),
-  [week]       = DATEPART(WEEK,     [date]),
-  [ISOweek]    = DATEPART(ISO_WEEK, [date]),
-  [DayOfWeek]  = DATEPART(WEEKDAY,  [date]),
+  [WeekDay]    = DATEPART(WEEKDAY,  [date]),
   [quarter]    = DATEPART(QUARTER,  [date]),
-  [year]       = DATEPART(YEAR,     [date]),
-  FirstOfYear  = CONVERT(DATE, DATEADD(YEAR,  DATEDIFF(YEAR,  0, [date]), 0)),
-  Style112     = CONVERT(CHAR(8),   [date], 112),
-  Style101     = CONVERT(CHAR(10),  [date], 101)
+  [year]       = DATEPART(YEAR,     [date])
 ;
 
 
 CREATE  TABLE Calendar_dimension
-WITH
-(
-    DISTRIBUTION = ROUND_ROBIN
+with (
+  DISTRIBUTION = ROUND_ROBIN
 )
 AS
 SELECT
   [Date]        = [date],
-  [Day]         = CONVERT(TINYINT, [day]),
-  [Weekday]     = CONVERT(TINYINT, [DayOfWeek]),
-  [Month]       = CONVERT(TINYINT, [month]),
-  [Quarter]     = CONVERT(TINYINT, [quarter]),
+  [Day]         = [day],
+  [Weekday]     = [WeekDay],
+  [Month]       = [month],
+  [Quarter]     = [quarter],
   QuarterName   = CONVERT(VARCHAR(6), CASE [quarter] WHEN 1 THEN 'First' 
                   WHEN 2 THEN 'Second' WHEN 3 THEN 'Third' WHEN 4 THEN 'Fourth' END), 
   [Year]        = [year],
-  MonthYear     = CONVERT(CHAR(8), LEFT([MonthName], 3) + ' ' + LEFT(Style112, 4))
+  MonthYear     = CONVERT(VARCHAR(20),  LEFT([MonthName], 3) + ' ' + CONVERT(VARCHAR(4),[Year]))
 FROM #dimdate
 ;
 
