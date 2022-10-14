@@ -1,0 +1,14 @@
+{
+	"name": "ADFbamuse",
+	"properties": {
+		"globalConfigurations": {
+			"PipelineBillingEnabled": "false"
+		}
+	},
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "316e8d62-5f79-4261-a944-6a98c30767fa",
+		"tenantId": "53072645-2a33-45c7-a3ce-dadf1b0c2faf"
+	}
+}

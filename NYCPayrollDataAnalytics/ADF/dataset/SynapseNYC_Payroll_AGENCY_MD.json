@@ -1,0 +1,16 @@
+{
+	"name": "SynapseNYC_Payroll_AGENCY_MD",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSynapseAnalytics1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlDWTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "NYC_Payroll_AGENCY_MD"
+		}
+	}
+}
